@@ -292,6 +292,10 @@ while True:
 
     done = False
     while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
 
         ####
         #screen.fill(white)
