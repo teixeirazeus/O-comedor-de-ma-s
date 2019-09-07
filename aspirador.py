@@ -134,46 +134,42 @@ def dVector(x,y,i,j):
 def buscaLargura(floor, nApple, busca):
     random.shuffle(busca)
 
-    buscaFiltrada = []
-    while(len(busca) != 0):
-        caso = busca.pop()
-        if caso is None: continue
-        x,y = caso[-1]
+    while True:
+        buscaFiltrada = []
+        while(len(busca) != 0):
+            caso = busca.pop()
+            if caso is None: continue
+            x,y = caso[-1]
 
-        # é valido?
-        if floor[x][y][0] == 'D': continue
+            # é valido?
+            if floor[x][y][0] == 'D': continue
 
-        if floor[x][y][0] == 'B' and len(caso) > 1:
-            count = 0
-            for c in caso:
-                if floor[c[0]][c[1]][0] == 'A':
-                    count += 1
-            if count == nApple:
-                return True, caso
-            else:
-                # rejeita
-                continue
+            if floor[x][y][0] == 'B' and len(caso) > 1:
+                count = 0
+                for c in caso:
+                    if floor[c[0]][c[1]][0] == 'A':
+                        count += 1
+                if count == nApple:
+                    return True, caso
+                else:
+                    # rejeita
+                    continue
 
-        # possibilidades
-        # print(caso+[[x+1, y]
+            if x+1 <= (len(floor)-1):
+                if (x+1, y) not in caso or (x, y-1) == (0,0):
+                    buscaFiltrada.append(caso+[(x+1, y)])
+            if x-1 >= 0:
+                if (x-1, y) not in caso or (x, y-1) == (0,0):
+                    buscaFiltrada.append(caso+[(x-1, y)])
+            if y+1 <= (len(floor[0])-1):
+                if (x, y+1) not in caso or (x, y-1) == (0,0):
+                    buscaFiltrada.append(caso+[(x, y+1)])
+            if y-1 >= 0:
+                if (x, y-1) not in caso or (x, y-1) == (0,0):
+                    buscaFiltrada.append(caso+[(x, y-1)])
 
-        if x+1 <= (len(floor)-1):
-            if [x+1, y] not in caso or [x, y-1] == [0,0]:
-                buscaFiltrada.append(caso+[[x+1, y]])
-        if x-1 >= 0:
-            if [x-1, y] not in caso or [x, y-1] == [0,0]:
-                buscaFiltrada.append(caso+[[x-1, y]])
-        if y+1 <= (len(floor[0])-1):
-            if [x, y+1] not in caso or [x, y-1] == [0,0]:
-                buscaFiltrada.append(caso+[[x, y+1]])
-        if y-1 >= 0:
-            if [x, y-1] not in caso or [x, y-1] == [0,0]:
-                buscaFiltrada.append(caso+[[x, y-1]])
-
-    if len(buscaFiltrada) > 0:
-        return buscaLargura(floor, nApple, buscaFiltrada)
-    else:
-        return False, []
+        busca = buscaFiltrada
+        if len(buscaFiltrada) == 0: return False, []
 
 def acharDirecao(solucao, arrows):
     map = {'-10':arrows[2],
@@ -261,7 +257,7 @@ while True:
         screen.blit(robotThinking, (700, 500))
         pygame.display.flip()
 
-        ok,solucao = buscaLargura(floor, nApple, [ [[0,0] ]])
+        ok,solucao = buscaLargura(floor, nApple, [ [(0,0) ]])
         if ok:
             intro = False
             print(solucao)
@@ -292,7 +288,6 @@ while True:
 
     direcao = acharDirecao(solucao, arrows)
 
-
     #
 
     done = False
@@ -307,11 +302,12 @@ while True:
         screen.blit(baseSprite, (50,50))
 
         i = 0
-        for passo in solucao:
-            if passo != [0,0]:
+        for passo in solucao[1:]:
+            if passo != (0,0):
                 x,y = floor[passo[0]][passo[1]][1]
                 screen.blit(direcao[i], (x-25,y-25))
                 i += 1
+
 
         for l in floor:
             for c in l:
